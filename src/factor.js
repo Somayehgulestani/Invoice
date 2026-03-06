@@ -3,18 +3,10 @@ import { useState } from "react";
 export function Factor() {
   const [list, setList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
-  const numbers = list.map((items) => items.price * items.number);
-  const total = numbers.reduce((total, numbers) => (total += numbers), 0);
-  function handleDeleteItem(index) {
-    console.log(index);
-
-    setList(list.filter((_, i) => index !== i));
-  }
 
   return (
     <>
       <Header />
-
       <div className="flex w-[90%] mx-auto  flex-wrap gap-4">
         <Form
           isOpen={isOpen}
@@ -22,52 +14,12 @@ export function Factor() {
           onSetList={setList}
           onIsOpen={setIsOpen}
         />
-        <div className=" bg-rose-100 w-[60%]  border-2 border-zinc-500 mx-auto flex flex-col justify-between ">
-          <table className="  w-full ">
-            <caption className="text-xl  font-semibold m-2">
-              💲Products Factor
-            </caption>
-
-            <tr className="row  ">
-              <th className=" header">Row</th>
-              <th className="  header">Name</th>
-              <th className=" header ">Price</th>
-              <th className=" header">Numbers</th>
-              <th className="header">Delete</th>
-            </tr>
-            {list.length <= 0
-              ? ""
-              : list.map((items, index) => {
-                  return (
-                    <>
-                      <tr key={index} className="row">
-                        <td>{++index}</td>
-                        <td className="cell">{items.name}</td>
-                        <td className="cell">$ {items.price}</td>
-                        <td className="cell">{items.number}</td>
-                        <td
-                          className="cursor-pointer "
-                          onClick={() => handleDeleteItem(--index)}
-                        >
-                          ❎
-                        </td>
-                      </tr>
-                    </>
-                  );
-                })}
-            <tr className="row">
-              <td className="cell ">total</td>
-
-              <td className="text-right">${total}</td>
-            </tr>
-          </table>
-          <button
-            className="p-1  bg-gradient-to-r from-teal-700 to-sky-800 text-white w-full font-semibold text-lg "
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            Add Pruchased Products
-          </button>
-        </div>
+        <InvoiceTable
+          isOpen={isOpen}
+          list={list}
+          onSetList={setList}
+          onIsOpen={setIsOpen}
+        />
       </div>
     </>
   );
@@ -140,5 +92,82 @@ function Form({ isOpen, list, onSetList, onIsOpen }) {
         </button>
       </form>
     )
+  );
+}
+
+function InvoiceTable({ isOpen, list, onSetList, onIsOpen }) {
+  return (
+    <div className=" bg-rose-100 w-[60%]  border-2 border-zinc-500 mx-auto flex flex-col justify-between ">
+      <table className="  w-full ">
+        <caption className="text-xl  font-semibold m-2">
+          💲Products Factor
+        </caption>
+        <TableHead />
+        <AddProducts list={list} onSetList={onSetList} />
+        <Total list={list} />
+      </table>
+      <button
+        className="p-1  bg-gradient-to-r from-teal-700 to-sky-800 text-white w-full font-semibold text-lg "
+        onClick={() => onIsOpen(!isOpen)}
+      >
+        Add Pruchased Products
+      </button>
+    </div>
+  );
+}
+
+function TableHead() {
+  return (
+    <thead className="row  ">
+      <th className=" header">Row</th>
+      <th className="  header">Name</th>
+      <th className=" header ">Price</th>
+      <th className=" header">Numbers</th>
+      <th className="header">Delete</th>
+    </thead>
+  );
+}
+
+function AddProducts({ list, onSetList }) {
+  function handleDeleteItem(index) {
+    console.log(index);
+
+    onSetList(list.filter((_, i) => index !== i));
+  }
+  return (
+    <>
+      {list.length <= 0
+        ? ""
+        : list.map((items, index) => {
+            return (
+              <>
+                <tr key={index} className="row">
+                  <td>{++index}</td>
+                  <td className="cell">{items.name}</td>
+                  <td className="cell">$ {items.price}</td>
+                  <td className="cell">{items.number}</td>
+                  <td
+                    className="cursor-pointer "
+                    onClick={() => handleDeleteItem(--index)}
+                  >
+                    ❎
+                  </td>
+                </tr>
+              </>
+            );
+          })}
+    </>
+  );
+}
+
+function Total({ list }) {
+  const numbers = list.map((items) => items.price * items.number);
+  const total = numbers.reduce((total, numbers) => (total += numbers), 0);
+  return (
+    <tr className="row">
+      <td className="cell ">Total</td>
+
+      <td className="text-right">${total}</td>
+    </tr>
   );
 }
